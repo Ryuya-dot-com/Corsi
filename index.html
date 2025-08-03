@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Corsi Block-Tapping Test（日本語）</title>
+  <style>
+    body { background: #eef1f6; font-family: sans-serif; }
+    .screen { display: none; max-width: 700px; margin: 60px auto; background: #fff; border-radius: 14px; box-shadow: 0 2px 12px #aaa; padding: 36px; font-size: 1.3rem; }
+    .active { display: block; }
+    .btn { margin-top: 28px; font-size: 1.1em; padding: 11px 34px; border-radius: 8px; border: none; background: #2977ee; color: #fff; cursor: pointer; }
+    .btn:active { background: #1658b1; }
+    #mainArea { min-height: 390px; }
+    .center { text-align: center; }
+    .blockgrid { display: grid; grid-template-columns: repeat(3, 80px); grid-template-rows: repeat(3, 80px); gap: 22px; justify-content: center; margin: 32px auto 12px auto;}
+    .blockbtn {
+      width: 80px; height: 80px; font-size: 1.3em; border-radius: 12px; border: 2.5px solid #888; background: #c5aef7;
+      cursor: pointer; transition: background .2s, border .2s;
+      position: relative; outline: none;
+    }
+    .blockbtn.highlight { background: #ffe664 !important; border: 2.5px solid #e5b800; }
+    .blockbtn.selected { background: #92eb92 !important; border: 2.5px solid #349a3e; }
+    .donebtn { width: 120px; margin: 28px auto 0 auto; display: block; background: #aaa8e9; }
+    .countdown { font-size: 2.3em; margin: 34px 0 12px 0; color: #3349c4;}
+    .feedback { margin-top: 32px; padding: 14px; border-radius: 9px; background: #efefef; font-size: 1.09em;}
+    .resultblock { margin: 34px 0;}
+    .score { font-size: 1.18em; font-weight: bold;}
+    label { display: block; margin-top: 18px; }
+    input[type=text] { font-size:1.1em; padding:5px 8px; border-radius:7px; border:1px solid #bbb; margin-top:6px; width:60%; }
+    .smiley { font-size: 2.7em; position:absolute; bottom: 8px; right: 12px; }
+  </style>
+</head>
+<body>
+
+<div id="entryScreen" class="screen active">
+  <b>Corsi Block-Tapping Test<br>参加者情報</b>
+  <form id="entryForm" class="center">
+    <label>名前（必須）<br>
+      <input type="text" id="participantName" required placeholder="氏名またはID">
+    </label>
+    <button class="btn" type="submit">はじめる</button>
+  </form>
+</div>
+
+<div id="mainArea" class="screen center"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
