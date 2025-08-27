@@ -6,6 +6,7 @@ let maxBlockCount = 2;     // 現在の課題数（最初は2）
 let errorCount = 0;
 let corsiSpan = 2;
 let trialN = 0;
+let trialStartTime = 0;
 
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('entryForm').onsubmit = function(e){
@@ -28,8 +29,8 @@ function showInstructions(){
   mainArea.innerHTML = `
     <b>テストの説明</b><br>
     <div style="margin:20px 0 24px 0; font-size:1.12em;">
-    9つのブロックが3×3の配置で表示されます。<br>
-    いくつかのブロックが順番に黄色く光ります。<br>
+    これからいくつかのブロックが表示されます。<br>
+    ブロックが順番に黄色く光ります。<br>
     <b>合図の後、同じ順番でブロックをクリック</b>してください。<br>
     順番は徐々に長くなります。2回連続で間違えるか、9個まで成功したら終了です。<br>
     <br>準備ができたら「スペースキー」を押してください。
@@ -75,7 +76,6 @@ async function doTrial(){
     <div class="blockgrid" id="blockgrid">
       ${[...Array(9)].map((_,i)=>`<button class="blockbtn" id="block${i}"></button>`).join("")}
     </div>
-    <button class="btn donebtn" style="visibility:hidden;">完了</button>
     <div id="statusText"></div>
   `;
   await sleep(600);
@@ -90,6 +90,9 @@ async function doTrial(){
 
   document.getElementById("statusText").innerHTML = `<span style="color:#198e0f;font-weight:bold;font-size:1.15em;">開始！</span>`;
   await sleep(350);
+  
+  // 試行開始時刻を記録
+  trialStartTime = Date.now();
 
   // 入力受付
   let input = [];
@@ -100,23 +103,21 @@ async function doTrial(){
       if(input.length<sequence.length && !btn.classList.contains("selected")){
         input.push(i);
         btn.classList.add("selected");
+        
+        // 必要な数のブロックが押されたら自動的に終了
         if(input.length===sequence.length){
-          document.querySelector(".donebtn").style.visibility = "visible";
+          // 回答完了時刻を記録
+          let responseTime = Date.now() - trialStartTime;
+          finishTrial(sequence, input, responseTime);
         }
       }
     };
   }
-  let doneBtn = document.querySelector(".donebtn");
-  doneBtn.disabled = false;
-  doneBtn.onclick = ()=>{
-    finishTrial(sequence, input);
-  };
-  doneBtn.style.visibility = "hidden";
 }
 
-function finishTrial(sequence, input){
+function finishTrial(sequence, input, responseTime){
   for(let i=0;i<9;i++) document.getElementById(`block${i}`).disabled = true;
-  document.querySelector(".donebtn").disabled = true;
+  
   let correct = input.length===sequence.length && input.every((v,i)=>v===sequence[i]);
   if(correct){
     corsiSpan = maxBlockCount;
@@ -125,6 +126,7 @@ function finishTrial(sequence, input){
   }else{
     errorCount++;
   }
+  
   trialLog.push({
     participant: participantName,
     datetime: startTime,
@@ -132,8 +134,10 @@ function finishTrial(sequence, input){
     blockCount: sequence.length,
     presentedSeq: sequence.map(x=>x+1).join("-"),
     responseSeq: input.map(x=>x+1).join("-"),
-    correct: correct ? 1 : 0
+    correct: correct ? 1 : 0,
+    responseTime: responseTime
   });
+  
   showTrialFeedback(correct);
   setTimeout(()=>{
     if(errorCount>=2 || maxBlockCount>9){
@@ -165,9 +169,9 @@ function showResult(){
 }
 
 function downloadResultCSV() {
-  const header = ["participant","datetime","trial","blockCount","presentedSeq","responseSeq","correct"];
+  const header = ["participant","datetime","trial","blockCount","presentedSeq","responseSeq","correct","responseTime"];
   const rows = trialLog.map(row=>[
-    row.participant,row.datetime,row.trial,row.blockCount,row.presentedSeq,row.responseSeq,row.correct
+    row.participant,row.datetime,row.trial,row.blockCount,row.presentedSeq,row.responseSeq,row.correct,row.responseTime
   ]);
   let csv = header.join(",") + "\n" + rows.map(r=>r.join(",")).join("\n");
   const blob = new Blob([csv], { type: 'text/csv' });
