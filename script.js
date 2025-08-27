@@ -29,8 +29,8 @@ function showInstructions(){
   mainArea.innerHTML = `
     <b>テストの説明</b><br>
     <div style="margin:20px 0 24px 0; font-size:1.12em;">
-    これからいくつかのブロックが表示されます。<br>
-    ブロックが順番に黄色く光ります。<br>
+    9つのブロックが表示されます。<br>
+    いくつかのブロックが順番に黄色く光ります。<br>
     <b>合図の後、同じ順番でブロックをクリック</b>してください。<br>
     順番は徐々に長くなります。2回連続で間違えるか、9個まで成功したら終了です。<br>
     <br>準備ができたら「スペースキー」を押してください。
@@ -72,7 +72,6 @@ async function doTrial(){
 
   // ブロックを一斉表示
   mainArea.innerHTML = `
-    <div style="margin-bottom:12px;"><b>試行 ${trialN}：${maxBlockCount}ブロック</b></div>
     <div class="blockgrid" id="blockgrid">
       ${[...Array(9)].map((_,i)=>`<button class="blockbtn" id="block${i}"></button>`).join("")}
     </div>
@@ -135,7 +134,7 @@ function finishTrial(sequence, input, responseTime){
     presentedSeq: sequence.map(x=>x+1).join("-"),
     responseSeq: input.map(x=>x+1).join("-"),
     correct: correct ? 1 : 0,
-    responseTime: responseTime
+    responseTime: responseTime  // ミリ秒単位で記録
   });
   
   showTrialFeedback(correct);
