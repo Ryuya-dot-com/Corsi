@@ -76,6 +76,7 @@ async function doTrial(){
       ${[...Array(9)].map((_,i)=>`<button class="blockbtn" id="block${i}"></button>`).join("")}
     </div>
     <div id="statusText"></div>
+    <button class="donebtn" id="doneBtn" style="display:none;">完了</button>
   `;
   await sleep(600);
 
@@ -93,8 +94,19 @@ async function doTrial(){
   // 試行開始時刻を記録
   trialStartTime = Date.now();
 
+  // 完了ボタンを表示
+  let doneBtn = document.getElementById("doneBtn");
+  doneBtn.style.display = "block";
+  
   // 入力受付
   let input = [];
+  
+  // 完了ボタンのクリックイベント
+  doneBtn.onclick = ()=>{
+    let responseTime = Date.now() - trialStartTime;
+    finishTrial(sequence, input, responseTime);
+  };
+
   for(let i=0;i<9;i++){
     let btn = document.getElementById(`block${i}`);
     btn.disabled = false;
@@ -103,7 +115,7 @@ async function doTrial(){
         input.push(i);
         btn.classList.add("selected");
         
-        // 必要な数のブロックが押されたら自動的に終了
+        // 必要な数のブロックが押されたら自動的に終了（オプション）
         if(input.length===sequence.length){
           // 回答完了時刻を記録
           let responseTime = Date.now() - trialStartTime;
@@ -116,6 +128,7 @@ async function doTrial(){
 
 function finishTrial(sequence, input, responseTime){
   for(let i=0;i<9;i++) document.getElementById(`block${i}`).disabled = true;
+  document.getElementById("doneBtn").disabled = true;
   
   let correct = input.length===sequence.length && input.every((v,i)=>v===sequence[i]);
   if(correct){
